@@ -49,18 +49,36 @@ def admin_menu(user):
             print("No such user")
         return True
     if choice == "3":
-        c.execute("SELECT first_name, last_name FROM workers ORDER BY worker_id")
-        for i, w in enumerate(c.fetchall(), start=1):
-            print(f"{i}. {w['first_name']} {w['last_name']}")
+        c.execute("SELECT worker_id, first_name, last_name FROM workers ORDER BY worker_id")
+        for w in c.fetchall():
+            print(f"{w['worker_id']}. {w['first_name']} {w['last_name']}")
 
-    editchoice = input("choose user")
-    #
-    #
-    #
-    #
-    #
-    #
-    #
+        userchoice = input("choose user id: ")
+        c.execute('SELECT * FROM workers WHERE worker_id = ?', (userchoice,))
+        row = c.fetchone()
+        if row is None:
+            print("no such user")
+            return True
+        username = row["first_name"] + " " + row["last_name"]
+        print("What would you like to change for user", username, "?")
+        print("name - 1\nsurname - 2\nphone - 3\nrole - 4")
+        editchoice = input("> ")
+        if editchoice == "1":
+            fname = input("enter name")
+            c.execute('UPDATE workers SET first_name = ? WHERE worker_id = ?', (fname, userchoice))
+        elif editchoice == "2":
+            surname = input("enter surname")
+            c.execute('UPDATE workers SET last_name = ? WHERE worker_id = ?', (surname, userchoice))
+        elif editchoice == "3":
+            phone = input("enter phone number")
+            c.execute('UPDATE workers SET phone = ? WHERE worker_id = ?', (phone, userchoice))
+        elif editchoice == "4":
+            role = input("enter role")
+            c.execute('UPDATE workers SET role = ? WHERE worker_id = ?', (role, userchoice))
+        else:
+            print("wrong choice")
+        conn.commit()
+        return True
     return choice != "4"
 
 def user_menu(user):
